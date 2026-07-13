@@ -1,61 +1,64 @@
 # FDA FAERS PoC Dashboard
 
-> **Data engineering pipeline:** openFDA API → temporal enrichment → MedDRA SOC classification → analytics-ready dataset.
+> FDA Adverse Event Reporting System — 2023 to 2026
 
-**FDA Adverse Event Reporting System** — 3,000 adverse event reports from **2023–2026**.
+**13,000 records** from **13 quarters** (2023-Q1 through 2026-Q1), enriched with MedDRA System Organ Class taxonomy.
 
 ## Dataset: `faers_2023_2026.csv`
 
 ### 13 Columns
 
-| Column | Type | Description | Example |
-|--------|------|-------------|---------|
-| `ReportID` | String | Unique FAERS safety report ID | `21803134` |
-| `Age` | Integer | Patient age at onset | `59` |
-| `Age_Unit` | Integer | 801=Years, 802=Months, 803=Weeks | `801` |
-| `Sex` | String | Patient sex | `Male`, `Female` |
-| `Drug` | String | Medicinal product | `DUPIXENT` |
-| `Reaction` | String | Adverse reaction (MedDRA PT) | `Headache` |
-| `Country` | String | Reporter country (ISO-2) | `US`, `ZA`, `GB` |
-| `Serious` | Integer | 1=Serious, 2=Not serious | `1`, `2` |
-| `Seriousness_Death` | Integer | 1=Death, 2=No death | `1`, `2` |
-| `Period` | String | **Enriched:** Year-Month | `2023-01` |
-| `Quarter` | String | **Enriched:** Year-Quarter | `2023-Q1` |
-| `Reaction_SOC` | String | **Enriched:** System Organ Class (26 cats) | `Nervous System Disorders` |
-| `Reaction_Group` | String | **Enriched:** Aggregated group (12 cats) | `Neurological` |
+| Column | Type | Example |
+|--------|------|---------|
+| `ReportID` | String | `21803134` |
+| `Age` | Integer | `59` |
+| `Age_Unit` | Integer | `801` (Years) |
+| `Sex` | String | `Male`, `Female` |
+| `Drug` | String | `DUPIXENT` |
+| `Reaction` | String (MedDRA PT) | `Headache` |
+| `Country` | String (ISO-2) | `US`, `ZA`, `GB` |
+| `Serious` | Integer | `1`=Serious, `2`=No |
+| `Seriousness_Death` | Integer | `1`=Death, `2`=No |
+| `Period` | String | `2023-01` |
+| `Quarter` | String | `2023-Q1` |
+| `Reaction_SOC` | String | `Nervous System Disorders` |
+| `Reaction_Group` | String | `Neurological` |
 
-## Pipeline
+### Distribution
 
-```
-openFDA API (4.3M records)
-        ↓ Stratified sampling (750/yr)
-  Temporal enrichment (Period, Quarter)
-        ↓ 
-  MedDRA SOC classification (26 SOCs, 99.5% coverage)
-        ↓
-  faers_2023_2026.csv
-```
+| Quarter | Rows |
+|---------|------|
+| 2023-Q1–Q4 | 4,000 |
+| 2024-Q1–Q4 | 4,000 |
+| 2025-Q1–Q4 | 4,000 |
+| 2026-Q1 | 1,000 |
+| **Total** | **13,000** |
 
-## Top Reaction SOCs
+### Top Reaction SOCs
 
-| SOC | % |
-|-----|---|
-| Product & Medication Issues | 18.1% |
-| General Disorders | 11.3% |
-| Nervous System Disorders | 7.5% |
-| Skin & Subcutaneous | 7.3% |
-| Gastrointestinal | 6.2% |
-| Respiratory | 5.9% |
-| Death | 5.1% |
+| Reaction_SOC | % |
+|--------------|---|
+| Product & Medication Issues | 17.8% |
+| General Disorders | 9.6% |
+| Nervous System Disorders | 7.1% |
+| Skin & Subcutaneous | 6.1% |
+| Gastrointestinal | 6.0% |
+| Respiratory | 5.7% |
+| Musculoskeletal | 4.3% |
+| Death | 3.6% |
+| Blood & Lymphatic | 3.5% |
+| Infections | 3.3% |
 
-## Use Cases (Tableau)
+## Data Pipeline
 
-- **Drug Safety Profile:** Drug vs Reaction_SOC heatmap
-- **Trend Analysis:** Period/Quarter over time
-- **Demographic:** Age by Sex by Reaction_SOC
-- **Geographic:** Country map by Reaction_Group
-- **Seriousness:** Serious × Seriousness_Death by Drug
+1. **openFDA API** — batch download by quarter (100 records/request)
+2. **Temporal enrichment** — `Period` (YYYY-MM) and `Quarter` (YYYY-Q#)
+3. **SOC classification** — keyword-based MedDRA mapping (93% coverage)
 
----
+## Use Cases
 
-*Source: [openFDA API](https://open.fda.gov/apis/drug/event/) · Classification: MedDRA SOC*
+- Drug safety profile: Drug vs Reaction_SOC heatmap
+- Trend analysis: Period/Quarter on timeline
+- Demographic: Age by Sex by Reaction_SOC
+- Geographic: Country map by Reaction_Group
+- Seriousness: Serious × Seriousness_Death by Drug
