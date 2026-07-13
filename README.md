@@ -2,7 +2,7 @@
 
 > FDA Adverse Event Reporting System — 2023 to 2026
 
-**13,000 records** from **13 quarters** (2023-Q1 through 2026-Q1), enriched with MedDRA System Organ Class taxonomy.
+**⚠️ SAMPLED DATA —** This repository contains a **13,000-row sample** drawn from the openFDA API. The full FAERS database holds **~4.3 million records** (as of April 2026). This sample is intended for **dashboard prototyping, proof-of-concept work, and exploratory analysis** — it is **not** the complete dataset and should not be used for production pharmacovigilance or medical decision-making.
 
 ## Dataset: `faers_2023_2026.csv`
 
